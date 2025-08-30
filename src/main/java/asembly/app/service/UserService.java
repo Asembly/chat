@@ -24,9 +24,31 @@ public class UserService {
     @Autowired
     private ChatRepository chatRepository;
 
-//    public ResponseEntity<Chat> addChat(String user_id, String chat_id)
-//    {
-//    }
+    public ResponseEntity<?> addChat(String user_id, AddChatDto chatDto)
+    {
+        var user = userRepository.findById(user_id).orElseThrow();
+        var chat = chatRepository.findById(chatDto.chat_id()).orElseThrow();
+
+        for(Chat item: user.getChats())
+        {
+            if(item.getId().equals(chatDto.chat_id()))
+            {
+                return ResponseEntity.badRequest().body(
+                        String.format(
+                                "Chat with id: %s already exist for this user.",
+                                chatDto.chat_id()
+                        ));
+            }
+        }
+
+        user.addChat(chat);
+
+        userRepository.save(user);
+
+        log.info("Chat add to user with id: {}.", user.getId());
+
+        return ResponseEntity.ok(new UserChatsDto(chat.getId(), chat.getTitle()));
+    }
 
     public ResponseEntity<List<UserDto>> findAll()
     {
@@ -56,7 +78,7 @@ public class UserService {
        for(Chat chat: user.getChats())
            userChatsDto.add(new UserChatsDto(chat.getId(),chat.getTitle()));
 
-       log.info("User with id: " + user.getId() + " displayed.");
+       log.info("User with id: {} displayed.", user.getId());
        return ResponseEntity.ok(new UserDto(user.getId(),user.getUsername(),userChatsDto));
     }
 

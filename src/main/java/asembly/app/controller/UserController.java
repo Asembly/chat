@@ -1,9 +1,6 @@
 package asembly.app.controller;
 
-import asembly.app.dto.ChatDto;
-import asembly.app.dto.CreateChatDto;
-import asembly.app.dto.CreateUserDto;
-import asembly.app.dto.UserDto;
+import asembly.app.dto.*;
 import asembly.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +25,12 @@ public class UserController {
     public ResponseEntity<ChatDto> createChat(@PathVariable String id, @RequestBody CreateChatDto chatDto)
     {
         return userService.createChat(id, chatDto);
+    }
+
+    @PatchMapping("/{id}/chat")
+    public ResponseEntity<?> addChat(@PathVariable String id, @RequestBody AddChatDto chatDto)
+    {
+        return userService.addChat(id, chatDto);
     }
 
     @GetMapping
