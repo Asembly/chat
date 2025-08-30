@@ -1,12 +1,11 @@
 package asembly.app.controller;
 
-import asembly.app.entity.Chat;
+import asembly.app.dto.AddUserDto;
+import asembly.app.dto.ChatDto;
 import asembly.app.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,8 +17,20 @@ public class ChatController {
     private ChatService chatService;
 
     @GetMapping
-    public ResponseEntity<List<Chat>> findAll()
+    public ResponseEntity<List<ChatDto>> findAll()
     {
        return chatService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ChatDto> findById(@PathVariable String id)
+    {
+        return chatService.findById(id);
+    }
+
+    @PatchMapping("/{id}/user")
+    public ResponseEntity<?> addUser(String id, AddUserDto userDto)
+    {
+        return chatService.addUser(id, userDto);
     }
 }
