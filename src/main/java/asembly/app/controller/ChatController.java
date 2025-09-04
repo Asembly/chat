@@ -1,6 +1,7 @@
 package asembly.app.controller;
 
 import asembly.app.dto.chat.ChatResponse;
+import asembly.app.dto.chat.ChatWithMessagesResponse;
 import asembly.app.dto.chat.ChatWithUsersResponse;
 import asembly.app.dto.message.MessageCreateRequest;
 import asembly.app.dto.message.MessageResponse;
@@ -29,6 +30,12 @@ public class ChatController {
     public ResponseEntity<ChatWithUsersResponse> findById(@PathVariable String id)
     {
         return chatService.findById(id);
+    }
+
+    @GetMapping("/{id}/message")
+    public ResponseEntity<ChatWithMessagesResponse> findByIdWithMessages(@PathVariable String id)
+    {
+        return chatService.findByIdWithMessages(id);
     }
 
     @PatchMapping("/{chat_id}/user/{user_id}")

@@ -1,6 +1,7 @@
 package asembly.app.service;
 
 import asembly.app.dto.chat.ChatResponse;
+import asembly.app.dto.chat.ChatWithMessagesResponse;
 import asembly.app.dto.chat.ChatWithUsersResponse;
 import asembly.app.dto.message.MessageCreateRequest;
 import asembly.app.dto.message.MessageResponse;
@@ -93,6 +94,13 @@ public class ChatService {
         log.info("Chats displayed.");
 
         return ResponseEntity.ok(chatMapper.toChatResponseList(chats));
+    }
+
+    public ResponseEntity<ChatWithMessagesResponse> findByIdWithMessages(String id)
+    {
+        var chat = chatRepository.findById(id);
+        return chat.map(value -> ResponseEntity.ok(chatMapper.toChatWithMessagesResponse(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public ResponseEntity<ChatWithUsersResponse> findById(String id)
