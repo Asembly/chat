@@ -1,6 +1,7 @@
 package asembly.app.service;
 
-import asembly.app.entity.Message;
+import asembly.app.dto.message.MessageResponse;
+import asembly.app.mapping.MessageMapper;
 import asembly.app.repository.ChatRepository;
 import asembly.app.repository.MessageRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,25 +17,26 @@ public class MessageService {
 
     @Autowired
     private ChatRepository chatRepository;
-
     @Autowired
     private MessageRepository messageRepository;
+    @Autowired
+    private MessageMapper messageMapper;
 
-    public ResponseEntity<List<Message>> findAll()
+    public ResponseEntity<List<MessageResponse>> findAll()
     {
         var messages = messageRepository.findAll();
 
-        log.info("Chats displayed.");
+        log.info("Message displayed.");
 
-        return ResponseEntity.ok(messages);
+        return ResponseEntity.ok(messageMapper.toMessageResponseList(messages));
     }
 
-    public ResponseEntity<Message> findById(String id)
+    public ResponseEntity<MessageResponse> findById(String id)
     {
-       var message = messageRepository.findById(id).orElseThrow();
+       var message = messageRepository.findById(id);
 
-       log.info("Chat with id: {} displayed.", message.getId());
+       return message.map(value -> ResponseEntity.ok(messageMapper.toMessageResponse(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
 
-       return ResponseEntity.ok(message);
     }
 }

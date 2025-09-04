@@ -37,6 +37,7 @@ public class ChatController {
         return chatService.addUser(chat_id, user_id);
     }
 
+
     @PostMapping("/{id}/message")
     public ResponseEntity<MessageResponse> createMessage(@PathVariable String id, @RequestBody MessageCreateRequest dto)
     {

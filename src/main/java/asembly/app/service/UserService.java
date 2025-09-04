@@ -60,7 +60,7 @@ public class UserService {
 
     public ResponseEntity<UserWithChatsResponse> findById(String id)
     {
-       var user = userRepository.findById(id);
+        var user = userRepository.findById(id);
 
         return user.map(value -> ResponseEntity.ok(userMapper.toUserWithChats(value)))
                 .orElseGet(() -> ResponseEntity.notFound().build());

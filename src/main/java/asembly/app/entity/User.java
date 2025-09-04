@@ -3,6 +3,8 @@ package asembly.app.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +21,11 @@ public class User {
 
     @Id
     private String id;
-    @Column(nullable = false)
+    @NotBlank
+    @Size(min = 6)
     private String username;
-    @Column(nullable = false)
+    @NotBlank
+    @Size(min = 8)
     private String password;
 
     @ManyToMany

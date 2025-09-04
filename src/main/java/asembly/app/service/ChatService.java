@@ -11,6 +11,7 @@ import asembly.app.mapping.ChatMapper;
 import asembly.app.mapping.MessageMapper;
 import asembly.app.mapping.UserMapper;
 import asembly.app.repository.ChatRepository;
+import asembly.app.repository.MessageRepository;
 import asembly.app.repository.UserRepository;
 import asembly.app.util.GeneratorId;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class ChatService {
     private ChatRepository chatRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MessageRepository messageRepository;
     @Autowired
     private SocketService socketService;
     @Autowired
@@ -72,7 +75,9 @@ public class ChatService {
                 chat
         );
 
-        chatRepository.save(chat);
+        messageRepository.save(message);
+
+        log.info("Message created.");
 
         chat.addMessage(message);
 
