@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: app
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:h2:mem:db
+    password: pass
+    username: sa
+#  jwt:
+#    secret: mysecretkey
+#    expiration: 3600000

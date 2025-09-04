@@ -1,8 +1,14 @@
 package asembly.app.service;
 
-import asembly.app.dto.*;
+import asembly.app.dto.chat.ChatCreateRequest;
+import asembly.app.dto.chat.ChatResponse;
+import asembly.app.dto.user.UserCreateRequest;
+import asembly.app.dto.user.UserResponse;
+import asembly.app.dto.user.UserWithChatsResponse;
 import asembly.app.entity.Chat;
 import asembly.app.entity.User;
+import asembly.app.mapping.ChatMapper;
+import asembly.app.mapping.UserMapper;
 import asembly.app.repository.ChatRepository;
 import asembly.app.repository.UserRepository;
 import asembly.app.util.GeneratorId;
@@ -11,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -23,22 +27,20 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private ChatRepository chatRepository;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private ChatMapper chatMapper;
 
-    public ResponseEntity<?> addChat(String user_id, AddChatDto chatDto)
+    public ResponseEntity<ChatResponse> addChat(String user_id, String chat_id)
     {
         var user = userRepository.findById(user_id).orElseThrow();
-        var chat = chatRepository.findById(chatDto.chat_id()).orElseThrow();
+        var chat = chatRepository.findById(chat_id).orElseThrow();
 
         for(Chat item: user.getChats())
         {
-            if(item.getId().equals(chatDto.chat_id()))
-            {
-                return ResponseEntity.badRequest().body(
-                        String.format(
-                                "Chat with id: %s already exist for this user.",
-                                chatDto.chat_id()
-                        ));
-            }
+            if(item.getId().equals(chat_id))
+                return ResponseEntity.badRequest().build();
         }
 
         user.addChat(chat);
@@ -47,83 +49,63 @@ public class UserService {
 
         log.info("Chat add to user with id: {}.", user.getId());
 
-        return ResponseEntity.ok(new UserChatsDto(chat.getId(), chat.getTitle()));
+        return ResponseEntity.ok(chatMapper.toChatResponse(chat));
     }
 
-    public ResponseEntity<List<UserDto>> findAll()
+    public ResponseEntity<List<UserResponse>> findAll()
     {
-        List<UserDto> userDto = new LinkedList<>();
         var users = userRepository.findAll();
-
-        for(User user : users)
-        {
-            userDto.add(new UserDto(
-                    user.getId(),
-                    user.getUsername(),
-                    Objects.requireNonNull(
-                            findById(user.getId()).getBody()).chats()
-            ));
-        }
-
-        log.info("Users displayed.");
-
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(userMapper.toUserResponseList(users));
     }
 
-    public ResponseEntity<UserDto> findById(String id)
+    public ResponseEntity<UserWithChatsResponse> findById(String id)
     {
-       List<UserChatsDto> userChatsDto = new LinkedList<>();
-       var user = userRepository.findById(id).orElseThrow();
+       var user = userRepository.findById(id);
 
-       for(Chat chat: user.getChats())
-           userChatsDto.add(new UserChatsDto(chat.getId(),chat.getTitle()));
-
-       log.info("User with id: {} displayed.", user.getId());
-       return ResponseEntity.ok(new UserDto(user.getId(),user.getUsername(),userChatsDto));
+        return user.map(value -> ResponseEntity.ok(userMapper.toUserWithChats(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<?> create(CreateUserDto userDto)
+    public ResponseEntity<UserResponse> create(UserCreateRequest dto)
     {
-        if(userRepository.findByUsername(userDto.username()).isPresent())
-            return ResponseEntity.badRequest().body("User already exist.");
-        var user = new User(
+        if(userRepository.findByUsername(dto.username()).isPresent())
+            return ResponseEntity.badRequest().build();
+
+        var newUser = new User(
                 GeneratorId.generateShortUuid(),
-                userDto.username(),
-                userDto.password(),
+                dto.username(),
+                dto.password(),
                 null);
 
-        userRepository.save(user);
+        userRepository.save(newUser);
 
         log.info("User is created.");
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userMapper.toUserResponse(newUser));
     }
 
-    public ResponseEntity<ChatDto> createChat(String id, CreateChatDto chatDto)
+    public ResponseEntity<ChatResponse> createChat(String id, ChatCreateRequest dto)
     {
-        List<ChatUsersDto> chatUsersDto = new LinkedList<>();
         var user = userRepository.findById(id).orElseThrow();
 
         var chat = new Chat(
                 GeneratorId.generateShortUuid(),
-                chatDto.title(),
+                dto.title(),
+                List.of(),
                 List.of()
         );
+
         var savedChat = chatRepository.save(chat);
         savedChat.addUser(user);
 
-        chatUsersDto.add(new ChatUsersDto(user.getId(), user.getUsername()));
-
-        if(chatDto.users() != null)
+        if(dto.usernames() != null)
         {
-            for(String item : chatDto.users())
+            for(String item : dto.usernames())
             {
-                if(!item.equals(user.getId()))
+                if(!item.equals(user.getUsername()))
                 {
-                   User groupUser = userRepository.findById(item).orElseThrow();
+                   var groupUser = userRepository.findByUsername(item).orElseThrow();
                    savedChat.addUser(groupUser);
-                   chatUsersDto.add(new ChatUsersDto(groupUser.getId(), groupUser.getUsername()));
-//                   groupUser.addChat(savedChat);
                 }
             }
         }
@@ -131,7 +113,7 @@ public class UserService {
         log.info("Chat is created.");
         chatRepository.save(savedChat);
 
-        return ResponseEntity.ok(new ChatDto(savedChat.getId(), savedChat.getTitle(), chatUsersDto));
+        return ResponseEntity.ok(chatMapper.toChatResponse(savedChat));
     }
 
 }

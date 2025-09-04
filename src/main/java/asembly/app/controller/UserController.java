@@ -1,6 +1,10 @@
 package asembly.app.controller;
 
-import asembly.app.dto.*;
+import asembly.app.dto.chat.ChatCreateRequest;
+import asembly.app.dto.chat.ChatResponse;
+import asembly.app.dto.user.UserCreateRequest;
+import asembly.app.dto.user.UserResponse;
+import asembly.app.dto.user.UserWithChatsResponse;
 import asembly.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,31 +20,31 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateUserDto userDto)
+    public ResponseEntity<UserResponse> create(@RequestBody UserCreateRequest dto)
     {
-        return userService.create(userDto);
+        return userService.create(dto);
     }
 
     @PostMapping("/{id}/chat")
-    public ResponseEntity<ChatDto> createChat(@PathVariable String id, @RequestBody CreateChatDto chatDto)
+    public ResponseEntity<ChatResponse> createChat(@PathVariable String id, @RequestBody ChatCreateRequest dto)
     {
-        return userService.createChat(id, chatDto);
+        return userService.createChat(id, dto);
     }
 
-    @PatchMapping("/{id}/chat")
-    public ResponseEntity<?> addChat(@PathVariable String id, @RequestBody AddChatDto chatDto)
+    @PatchMapping("/{user_id}/chat/{chat_id}")
+    public ResponseEntity<?> addChat(@PathVariable String user_id, @PathVariable String chat_id)
     {
-        return userService.addChat(id, chatDto);
+        return userService.addChat(user_id, chat_id);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAll()
+    public ResponseEntity<List<UserResponse>> findAll()
     {
         return userService.findAll();
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<UserDto> findById(@PathVariable String id)
+    public ResponseEntity<UserWithChatsResponse> findById(@PathVariable String id)
     {
         return userService.findById(id);
     }

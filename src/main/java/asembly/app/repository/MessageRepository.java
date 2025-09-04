@@ -1,8 +1,8 @@
 package asembly.app.repository;
 
-import asembly.app.entity.Chat;
+import asembly.app.entity.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChatRepository extends JpaRepository<Chat, String> {}
+public interface MessageRepository extends JpaRepository<Message, String> {}
