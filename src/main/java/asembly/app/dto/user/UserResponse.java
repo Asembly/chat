@@ -1,3 +1,5 @@
 package asembly.app.dto.user;
 
-public record UserResponse(String id, String username) {}
+import java.time.LocalDate;
+
+public record UserResponse(String id, String username, LocalDate created_at) {}

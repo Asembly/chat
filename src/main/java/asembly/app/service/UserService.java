@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -75,6 +76,7 @@ public class UserService {
                 GeneratorId.generateShortUuid(),
                 dto.username(),
                 dto.password(),
+                LocalDate.now(),
                 null);
 
         userRepository.save(newUser);
@@ -91,6 +93,7 @@ public class UserService {
         var chat = new Chat(
                 GeneratorId.generateShortUuid(),
                 dto.title(),
+                LocalDate.now(),
                 List.of(),
                 List.of()
         );

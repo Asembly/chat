@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class User {
     @NotBlank
     @Size(min = 8)
     private String password;
+    @Temporal(TemporalType.DATE)
+    private LocalDate created_at;
 
     @ManyToMany
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")

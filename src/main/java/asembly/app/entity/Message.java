@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @Table(name = "messages")
@@ -19,6 +21,8 @@ public class Message {
     private String text;
     @NotBlank
     private String author_id;
+    @Temporal(TemporalType.DATE)
+    private LocalDate created_at;
 
     @ManyToOne
     @JoinColumn(name = "chat_id", referencedColumnName = "id")
