@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -64,13 +65,13 @@ public class ChatServiceTest {
     public void findAll_doReturnListChatResponse()
     {
         var chats = List.of(
-                new Chat("1","chat1",null,null),
-                new Chat("2","chat2",null,null)
+                new Chat("1","chat1", LocalDate.now(),null, null),
+                new Chat("2","chat2",LocalDate.now(),null,null)
         );
 
         var dto = List.of(
-                new ChatResponse("1","chat1"),
-                new ChatResponse("2","chat2"));
+                new ChatResponse("1","chat1",LocalDate.now()),
+                new ChatResponse("2","chat2",LocalDate.now()));
 
         when(chatRepository.findAll()).thenReturn(chats);
         when(chatMapper.toChatResponseList(chats)).thenReturn(dto);
@@ -86,7 +87,7 @@ public class ChatServiceTest {
     public void findById_doReturnChatResponse()
     {
        var dto = new ChatWithUsersResponse("1", "chat1", null);
-       var chat = new Chat("1", "chat1", null, null);
+       var chat = new Chat("1", "chat1",LocalDate.now(), null, null);
 
        when(chatRepository.findById(chat.getId())).thenReturn(Optional.of(chat));
        when(chatMapper.toChatWithUsersResponse(chat)).thenReturn(dto);
@@ -102,7 +103,7 @@ public class ChatServiceTest {
     public void findByIdWithMessages_doReturnChatWithMessagesResponse()
     {
         var dto = new ChatWithMessagesResponse("1", "chat1", null);
-        var chat = new Chat("1", "chat1", null, null);
+        var chat = new Chat("1", "chat1",LocalDate.now(), null, null);
 
         when(chatRepository.findById(chat.getId())).thenReturn(Optional.of(chat));
         when(chatMapper.toChatWithMessagesResponse(chat)).thenReturn(dto);
@@ -117,10 +118,10 @@ public class ChatServiceTest {
     @Test
     public void addUser_doReturnUserResponse()
     {
-        var chat = new Chat("1", "chat1", null, new LinkedList<>());
-        var user = new User("1", "tester", "123456789", new LinkedList<>());
+        var chat = new Chat("1", "chat1",LocalDate.now(), null, new LinkedList<>());
+        var user = new User("1", "tester", "123456789",LocalDate.now(), new LinkedList<>());
 
-        var userDto = new UserResponse(user.getId(),user.getUsername());
+        var userDto = new UserResponse(user.getId(),user.getUsername(),LocalDate.now());
 
         when(chatRepository.findById(chat.getId())).thenReturn(Optional.of(chat));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));

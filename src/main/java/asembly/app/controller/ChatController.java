@@ -4,8 +4,6 @@ import asembly.app.dto.chat.ChatResponse;
 import asembly.app.dto.chat.ChatWithMessagesResponse;
 import asembly.app.dto.chat.ChatWithUsersResponse;
 import asembly.app.dto.message.MessageCreateRequest;
-import asembly.app.dto.message.MessageResponse;
-import asembly.app.dto.user.UserResponse;
 import asembly.app.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,14 +37,14 @@ public class ChatController {
     }
 
     @PatchMapping("/{chat_id}/user/{user_id}")
-    public ResponseEntity<UserResponse> addUser(@PathVariable String chat_id, @PathVariable String user_id)
+    public ResponseEntity<?> addUser(@PathVariable String chat_id, @PathVariable String user_id)
     {
         return chatService.addUser(chat_id, user_id);
     }
 
 
     @PostMapping("/{id}/message")
-    public ResponseEntity<MessageResponse> createMessage(@PathVariable String id, @RequestBody MessageCreateRequest dto)
+    public ResponseEntity<?> createMessage(@PathVariable String id, @RequestBody MessageCreateRequest dto)
     {
        return chatService.createMessage(id, dto);
     }
