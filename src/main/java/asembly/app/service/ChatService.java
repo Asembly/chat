@@ -4,10 +4,9 @@ import asembly.app.dto.chat.ChatResponse;
 import asembly.app.dto.chat.ChatWithMessagesResponse;
 import asembly.app.dto.chat.ChatWithUsersResponse;
 import asembly.app.dto.message.MessageCreateRequest;
-import asembly.app.dto.message.MessageResponse;
-import asembly.app.dto.user.UserResponse;
 import asembly.app.entity.Message;
 import asembly.app.entity.User;
+import asembly.app.error.ErrorMessage;
 import asembly.app.mapping.ChatMapper;
 import asembly.app.mapping.MessageMapper;
 import asembly.app.mapping.UserMapper;
@@ -17,6 +16,7 @@ import asembly.app.repository.UserRepository;
 import asembly.app.util.GeneratorId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -42,10 +42,16 @@ public class ChatService {
     @Autowired
     private MessageMapper messageMapper;
 
-    public ResponseEntity<UserResponse> addUser(String chat_id, String user_id)
+    public ResponseEntity<?> addUser(String chat_id, String user_id)
     {
-        var chat = chatRepository.findById(chat_id).orElseThrow();
-        var user = userRepository.findById(user_id).orElseThrow();
+        var optionalChat = chatRepository.findById(chat_id);
+        var optionalUser = userRepository.findById(user_id);
+
+        if(optionalChat.isEmpty() || optionalUser.isEmpty())
+            return ResponseEntity.badRequest().body(new ErrorMessage(LocalDate.now(), "Object not found", HttpStatus.NOT_FOUND));
+
+        var user = optionalUser.get();
+        var chat = optionalChat.get();
 
         for(User item: chat.getUsers())
         {
@@ -62,10 +68,20 @@ public class ChatService {
         return ResponseEntity.ok(userMapper.toUserResponse(user));
     }
 
-    public ResponseEntity<MessageResponse> createMessage(String chat_id, MessageCreateRequest dto)
+    public ResponseEntity<?> createMessage(String chat_id, MessageCreateRequest dto)
     {
-        var chat = chatRepository.findById(chat_id).orElseThrow();
-        var user = userRepository.findById(dto.author_id()).orElseThrow();
+        if(dto == null || dto.text() == null || dto.author_id() == null)
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(LocalDate.now(),"Request body not valid", HttpStatus.BAD_REQUEST));
+
+        var optionalChat = chatRepository.findById(chat_id);
+        var optionalUser = userRepository.findById(dto.author_id());
+
+        if(optionalChat.isEmpty() || optionalUser.isEmpty())
+            return ResponseEntity.badRequest().body(new ErrorMessage(LocalDate.now(), "Object not found", HttpStatus.NOT_FOUND));
+
+        var user = optionalUser.get();
+        var chat = optionalChat.get();
 
         if(!user.getChats().contains(chat))
             return ResponseEntity.notFound().build();
