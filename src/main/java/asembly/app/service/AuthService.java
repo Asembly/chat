@@ -78,8 +78,6 @@ public class AuthService {
         var newUser = optionalUser.get();
 
         var optionalRefresh = refreshTokenRepository.findTokenByUserId(newUser.getId());
-        log.info(optionalRefresh.toString());
-
         RefreshResponse refresh;
 
         if(optionalRefresh.isEmpty())
@@ -89,6 +87,7 @@ public class AuthService {
 
 
         var access = jwtService.genJwt(userDto.username());
+        log.info("test gen jwt");
 
         if (encoder.matches(userDto.password(), newUser.getPassword()))
         {

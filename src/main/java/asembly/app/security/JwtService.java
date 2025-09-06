@@ -2,16 +2,17 @@ package asembly.app.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.Date;
 
+@Slf4j
 @Service
 public class JwtService {
 
@@ -26,27 +27,25 @@ public class JwtService {
             return JWT.create()
                     .withSubject(username)
                     .withIssuer("auth0")
-                    .withIssuedAt(Timestamp.from(Instant.now()))
-                    .withExpiresAt(Timestamp.from(Instant.now().plusMillis(expirationMs)))
+                    .withIssuedAt(new Date())
+                    .withExpiresAt(new Date(new Date().getTime() + expirationMs))
                     .sign(alg);
-        }catch(JWTCreationException e)
-        {
-            throw new JWTCreationException(e.getMessage() + "\nInvalid Signing configuration / Couldn't convert Claims.", e.getCause());
+        }catch (Exception e) {
+            throw new RuntimeException("Failed to generate JWT token", e);
         }
     }
 
     public boolean verifyJwt(String token)
     {
-        DecodedJWT decodedJWT;
         try{
             Algorithm alg = Algorithm.HMAC256(secretKey);
             JWTVerifier verifier = JWT.require(alg)
                     .withIssuer("auth0")
                     .build();
-            decodedJWT = verifier.verify(token);
+            verifier.verify(token);
             return true;
         }catch (JWTVerificationException e) {
-            throw new JWTVerificationException(e.getMessage() + "\nInvalid signature/claims", e.getCause());
+            return false;
         }
     }
 

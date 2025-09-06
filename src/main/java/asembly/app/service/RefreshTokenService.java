@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -55,7 +57,7 @@ public class RefreshTokenService {
                     GeneratorId.generateShortUuid(),
                     user,
                     UUID.randomUUID().toString(),
-                    Instant.now().plusMillis(refreshTokenExpiration)
+                    Timestamp.from(Instant.now().plusMillis(refreshTokenExpiration)).getTime()
                 );
 
         refreshTokenRepository.save(token);
@@ -89,6 +91,6 @@ public class RefreshTokenService {
     }
 
     public boolean isTokenExpired(RefreshToken token) {
-        return token.getExpiryDate().isBefore(Instant.now());
+        return Time.from(Instant.now()).getTime() > token.getExpires_at();
     }
 }
