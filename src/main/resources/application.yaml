@@ -8,3 +8,9 @@ spring:
     url: jdbc:postgresql://localhost:5433/db
     password: ${SPRING_DATASOURCE_PASSWORD}
     username: ${SPRING_DATASOURCE_USERNAME}
+  jwt:
+    access:
+      expiration: 3600000
+    refresh:
+      expiration: 360000000
+    secret: ${SPRING_JWT_SECRET}

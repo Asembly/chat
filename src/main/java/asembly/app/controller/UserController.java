@@ -1,7 +1,6 @@
 package asembly.app.controller;
 
 import asembly.app.dto.chat.ChatCreateRequest;
-import asembly.app.dto.user.UserCreateRequest;
 import asembly.app.dto.user.UserResponse;
 import asembly.app.dto.user.UserWithChatsResponse;
 import asembly.app.service.UserService;
@@ -17,12 +16,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @PostMapping
-    public ResponseEntity<UserResponse> create(@RequestBody UserCreateRequest dto)
-    {
-        return userService.create(dto);
-    }
 
     @PostMapping("/{id}/chat")
     public ResponseEntity<?> createChat(@PathVariable String id, @RequestBody ChatCreateRequest dto)
