@@ -12,5 +12,7 @@ spring:
     access:
       expiration: 3600000
     refresh:
-      expiration: 360000000
+      expiration: 2419200000
     secret: ${SPRING_JWT_SECRET}
+  kafka:
+    bootstrap-servers: localhost:9092

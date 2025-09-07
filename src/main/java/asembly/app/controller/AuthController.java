@@ -22,8 +22,8 @@ public class AuthController {
         return refreshTokenService.updateAccessToken(token);
     }
 
-    @PostMapping("/logout/{token}")
-    public ResponseEntity<String> logout(@RequestBody String token)
+    @DeleteMapping("/logout/{token}")
+    public ResponseEntity<String> logout(@PathVariable String token)
     {
         return refreshTokenService.logout(token);
     }
