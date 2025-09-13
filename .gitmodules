@@ -1,0 +1,6 @@
+[submodule "chat-service"]
+	path = chat-service
+	url = https://github.com/Asembly/chat.git
+[submodule "services/chat-service"]
+	path = services/chat-service
+	url = https://github.com/Asembly/chat.git
